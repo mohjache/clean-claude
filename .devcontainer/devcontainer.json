@@ -1,0 +1,11 @@
+{
+  "name": "clean-claude",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    }
+  },
+  "postCreateCommand": "chmod +x scripts/* && npm install -g @anthropic-ai/claude-code"
+}

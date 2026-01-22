@@ -1,0 +1,15 @@
+# Docker artifacts
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node modules in individual projects (each project should have its own .gitignore)
+projects/*/node_modules/
+projects/*/.env
+projects/*/.env.local

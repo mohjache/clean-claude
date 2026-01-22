@@ -1,0 +1,39 @@
+#!/bin/bash
+set -e
+
+if [ -z "$1" ]; then
+    echo "Usage: ./scripts/new <project-name>"
+    exit 1
+fi
+
+PROJECT_NAME="$1"
+PROJECT_DIR="projects/$PROJECT_NAME"
+
+# Check if project already exists
+if [ -d "$PROJECT_DIR" ]; then
+    echo "Error: Project '$PROJECT_NAME' already exists"
+    exit 1
+fi
+
+# Create project directory
+echo "Creating project directory: $PROJECT_DIR"
+mkdir -p "$PROJECT_DIR"
+
+# Build Docker image if it doesn't exist
+echo "Building Docker image..."
+docker build -t clean-claude-dev ./docker
+
+# Run container
+echo "Starting container for $PROJECT_NAME..."
+docker run -d \
+    --name "clean-claude-$PROJECT_NAME" \
+    -v "$(pwd)/$PROJECT_DIR:/workspace" \
+    clean-claude-dev
+
+echo ""
+echo "Project '$PROJECT_NAME' created!"
+echo "To enter the container, run:"
+echo "  docker exec -it clean-claude-$PROJECT_NAME bash"
+echo ""
+echo "To run Claude Code inside:"
+echo "  docker exec -it clean-claude-$PROJECT_NAME claude"

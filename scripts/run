@@ -1,0 +1,45 @@
+#!/bin/bash
+set -e
+
+if [ -z "$1" ]; then
+    echo "Usage: ./scripts/run <project-name>"
+    exit 1
+fi
+
+PROJECT_NAME="$1"
+PROJECT_DIR="projects/$PROJECT_NAME"
+CONTAINER_NAME="clean-claude-$PROJECT_NAME"
+
+# Check if project exists
+if [ ! -d "$PROJECT_DIR" ]; then
+    echo "Error: Project '$PROJECT_NAME' doesn't exist"
+    echo "Create it first with: ./scripts/new $PROJECT_NAME"
+    exit 1
+fi
+
+# Check if container is already running
+if docker ps -q -f name="$CONTAINER_NAME" | grep -q .; then
+    echo "Container already running for $PROJECT_NAME"
+else
+    # Check if container exists but is stopped
+    if docker ps -aq -f name="$CONTAINER_NAME" | grep -q .; then
+        echo "Starting stopped container..."
+        docker start "$CONTAINER_NAME"
+    else
+        # Create new container
+        echo "Creating new container for $PROJECT_NAME..."
+        docker build -t clean-claude-dev ./docker
+        docker run -d \
+            --name "$CONTAINER_NAME" \
+            -v "$(pwd)/$PROJECT_DIR:/workspace" \
+            clean-claude-dev
+    fi
+fi
+
+echo ""
+echo "Container running for '$PROJECT_NAME'"
+echo "To enter the container, run:"
+echo "  docker exec -it $CONTAINER_NAME bash"
+echo ""
+echo "To run Claude Code inside:"
+echo "  docker exec -it $CONTAINER_NAME claude"
